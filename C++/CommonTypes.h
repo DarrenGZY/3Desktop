@@ -26,7 +26,6 @@
 #ifdef VR_DESKTOP
 #include "VertexShader1.h"
 #include "PixelShader1.h"
-
 #endif // VR_DESKTOP
 
 

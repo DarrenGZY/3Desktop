@@ -29,6 +29,7 @@ class OUTPUTMANAGER
         void CleanRefs();
         HANDLE GetSharedHandle();
         void WindowResize();
+		void OnKey(unsigned vk, bool down);
 
     private:
     // Methods
@@ -65,7 +66,7 @@ class OUTPUTMANAGER
 
 #ifdef VR_DESKTOP
 		ID3D11Texture2D* m_ScreenTex;
-		ID3D11VertexShader* m_ScreenVertexShader; 
+		ID3D11VertexShader* m_ScreenVertexShader;
 		ID3D11PixelShader* m_ScreenPixelShader;
 		ID3D11InputLayout* m_ScreenInputLayout;
 

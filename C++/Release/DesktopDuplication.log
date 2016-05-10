@@ -1,0 +1,18 @@
+﻿生成启动时间为 2016/4/7 16:50:00。
+     1>项目“D:\DXGI desktop duplication sample\C++\DesktopDuplication.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         D:\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"D:\DXGI desktop duplication sample\C++\Release\\" /Zi /nologo /W1 /WX- /O2 /Oy- /D WIN32 /D NDEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt OutputManager.cpp
+         OutputManager.cpp
+       Link:
+         D:\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\DXGI desktop duplication sample\C++\Release\DesktopDuplication.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"C:\Program Files (x86)\Visual Leak Detector\lib\Win32" dxgi.lib d3d11.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"D:\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"D:\DXGI desktop duplication sample\C++\Release\DesktopDuplication.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\DXGI desktop duplication sample\C++\Release\DesktopDuplication.lib" /MACHINE:X86 /SAFESEH Release\DesktopDuplication.obj
+         Release\DisplayManager.obj
+         Release\DuplicationManager.obj
+         Release\OutputManager.obj
+         Release\ThreadManager.obj
+         Release\WICTextureLoader.obj
+         DesktopDuplication.vcxproj -> D:\DXGI desktop duplication sample\C++\Release\DesktopDuplication.exe
+     1>已完成生成项目“D:\DXGI desktop duplication sample\C++\DesktopDuplication.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.39

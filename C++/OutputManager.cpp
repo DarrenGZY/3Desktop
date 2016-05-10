@@ -11,6 +11,9 @@ using namespace DirectX;
 #ifdef VR_DESKTOP
 typedef bool(*VRDesktop_SZVR_GETData)(float inputs[], float outputs[]);
 VRDesktop_SZVR_GETData SZVR_GetData = NULL;
+
+void UpdateCameraPosition(XMVECTOR & camPos);
+void UpdateRadiusAndAngle(float &radius, float &halfAngle);
 #endif // VR_DESKTOP
 
 //#define DEBUG_VERTEX
@@ -1050,13 +1053,15 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	ID3D11Buffer *pIBuffer = nullptr;
 
 
-	const int n = 40;
+	const int n = 400;
 	
-	int halfDegree = 25;
+	static float halfDegree = 25;
+	static float r = 10;							// radius
+	UpdateRadiusAndAngle(r, halfDegree);
 
 	float sita = XMConvertToRadians(-halfDegree);	// sita range from -60 to 60
 	float delta = XMConvertToRadians(2*halfDegree/n);	// draw texture every 5 degree
-	float r = 10;							// radius
+	
 
 	float centerZ = 8.0f;	// circle center z-axis offset
 	float centerX = 1.0f;	// circle center x-axis offset
@@ -1374,11 +1379,13 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 
 		DirectX::XMMATRIX matView, matPorj;
 
-		XMVECTOR camPos;
+		static XMVECTOR camPos = XMVectorSet(-0.1f, 0.0f, 0.0f, 0.0f);;
 		if (eyes[index] == LEFT_EYE)	// left eye
-			camPos = XMVectorSet(0.01f, 0.0f, 0.0f, 0.0f);
+			camPos += XMVectorSet(0.2f, 0.0f, 0.0f, 0.0f);		// start at (0.1, 0.0, 0.0)
 		else                            // right eye
-			camPos = XMVectorSet(-0.01f, 0.0f, 0.0f, 0.0f);
+			camPos += XMVectorSet(-0.2f, 0.0f, 0.0f, 0.0f);		// start at (-0.1, 0.0, 0.0)
+
+		UpdateCameraPosition(camPos);
 		
 		XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
@@ -1607,11 +1614,9 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 
 	// left eye
 	m_DeviceContext->PSSetShaderResources(0, 1, &pEyeShaderResource[0]);
-	m_DeviceContext->DrawIndexed(6, 6, 0);
-
 	// right eye
-	m_DeviceContext->PSSetShaderResources(0, 1, &pEyeShaderResource[1]);
-	m_DeviceContext->DrawIndexed(6, 0, 0);
+	m_DeviceContext->PSSetShaderResources(1, 1, &pEyeShaderResource[1]);
+	m_DeviceContext->DrawIndexed(12, 0, 0);
 
 	//m_SwapChain->SetFullscreenState(TRUE, NULL);
 

@@ -1,6 +1,5 @@
-
-
-Texture2D tx : register(t0);
+Texture2D tx_right : register(t0);
+Texture2D tx_left : register(t1);
 SamplerState samLinear : register(s0);
 
 struct PS_INPUT
@@ -30,6 +29,13 @@ float4 PS(PS_INPUT input) : SV_Target
 	}
 	else
 	{
-		return tx.Sample(samLinear, distorteduv);
+		if (input.Pos.x <= 1280) // half of the screen width
+		{
+			return tx_left.Sample(samLinear, distorteduv);
+		}
+		else 
+		{
+			return tx_right.Sample(samLinear, distorteduv);
+		}
 	}
 }

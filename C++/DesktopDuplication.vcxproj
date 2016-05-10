@@ -162,6 +162,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="DirectModeManager.cpp" />
     <ClCompile Include="DisplayManager.cpp" />
     <ClCompile Include="DuplicationManager.cpp" />
     <ClCompile Include="OutputManager.cpp" />
@@ -170,6 +171,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonTypes.h" />
+    <ClInclude Include="DirectModeManager.h" />
+    <ClInclude Include="DirectModeTypes.h" />
     <ClInclude Include="DisplayManager.h" />
     <ClInclude Include="DuplicationManager.h" />
     <ClInclude Include="OutputManager.h" />
@@ -214,6 +217,7 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PS</EntryPointName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).h</HeaderFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">g_PS1</VariableName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="VertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VS</EntryPointName>

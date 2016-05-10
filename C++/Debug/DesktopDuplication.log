@@ -1,0 +1,21 @@
+﻿生成启动时间为 2016/5/9 14:15:57。
+     1>项目“D:\DXGI desktop duplication sample\C++\DesktopDuplication.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         D:\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"D:\DXGI desktop duplication sample\C++\Debug\\" /Zi /nologo /W1 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt DirectModeManager.cpp
+         DirectModeManager.cpp
+     1>d:\dxgi desktop duplication sample\c++\nvapi.h(10485): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+     1>d:\dxgi desktop duplication sample\c++\nvapi.h(28978): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+       Link:
+         D:\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\DXGI desktop duplication sample\C++\Debug\DesktopDuplication.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Program Files (x86)\Visual Leak Detector\lib\Win32" d3d11.lib dxgi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"D:\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"D:\DXGI desktop duplication sample\C++\Debug\DesktopDuplication.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\DXGI desktop duplication sample\C++\Debug\DesktopDuplication.lib" /MACHINE:X86 Debug\DesktopDuplication.obj
+         Debug\DirectModeManager.obj
+         Debug\DisplayManager.obj
+         Debug\DuplicationManager.obj
+         Debug\OutputManager.obj
+         Debug\ThreadManager.obj
+         Debug\WICTextureLoader.obj
+         DesktopDuplication.vcxproj -> D:\DXGI desktop duplication sample\C++\Debug\DesktopDuplication.exe
+     1>已完成生成项目“D:\DXGI desktop duplication sample\C++\DesktopDuplication.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.18

@@ -12,10 +12,26 @@
 #include "OutputManager.h"
 #include "ThreadManager.h"
 
+using namespace DirectX;
+
 //
 // Globals
 //
 OUTPUTMANAGER OutMgr;
+
+
+unsigned char	MoveForward = 0,
+MoveBack = 0,
+MoveLeft = 0,
+MoveRight = 0,
+DegreeUp = 0,
+DegreeDown = 0,
+RadiusUp = 0,
+RadiusDown = 0;
+
+void OnKey(unsigned vk, bool down);
+void UpdateCameraPosition(XMVECTOR & camPos);
+void UpdateRadiusAndAngle(float &radius, float &halfAngle);
 
 // Below are lists of errors expect from Dxgi API calls when a transition event like mode change, PnpStop, PnpStart
 // desktop switch, TDR or session disconnect/reconnect. In all these cases we want the application to clean up the threads that process
@@ -225,7 +241,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         return 0;
     }
 #ifdef VR_DESKTOP
-	RECT WindowRect = { 0, 0, 2560, 1440 };
+	RECT WindowRect = { 0, 0, 2880, 1440 };
 #else
 	RECT WindowRect = { 0, 0, 800, 600 };
 #endif // VR_DESKTOP
@@ -235,8 +251,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 #ifdef VR_DESKTOP
 	WindowHandle = CreateWindowW(L"ddasample", L"DXGI desktop duplication sample",
 		WS_OVERLAPPEDWINDOW,
-		0, 0,
-		WindowRect.right - WindowRect.left, WindowRect.bottom - WindowRect.top,
+		1910, 0,
+		WindowRect.right - WindowRect.left - 1910, WindowRect.bottom - WindowRect.top,	// Need to minus 1910, dont know why
 		nullptr, nullptr, hInstance, nullptr);
 
 #else
@@ -444,6 +460,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             OutMgr.WindowResize();
             break;
         }
+		case WM_KEYUP:
+			OnKey((unsigned)wParam, false);
+			break;
+		case WM_KEYDOWN:
+			OnKey((unsigned)wParam, true);
+			break;
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -717,4 +739,57 @@ void DisplayMsg(_In_ LPCWSTR Str, _In_ LPCWSTR Title, HRESULT hr)
     }
 
     delete [] OutStr;
+}
+
+void OnKey(unsigned vk, bool down)
+{
+	switch (vk)
+	{
+	case VK_UP:
+		MoveForward = down ? (MoveForward | 1) : (MoveForward & ~1);
+		break;
+	case VK_DOWN:
+		MoveBack = down ? (MoveBack | 1) : (MoveBack & ~1);
+		break;
+	case VK_LEFT:
+		MoveLeft = down ? (MoveLeft | 1) : (MoveLeft & ~1);
+		break;
+	case VK_RIGHT:
+		MoveRight = down ? (MoveRight | 1) : (MoveRight & ~1);
+		break;
+	case 'W':
+		RadiusUp = down ? (RadiusUp | 1) : (RadiusUp & ~1);
+		break;
+	case 'S':
+		RadiusDown = down ? (RadiusDown | 1) : (RadiusDown & ~1);
+		break;
+	case 'A':
+		DegreeDown = down ? (DegreeDown | 1) : (DegreeDown & ~1);
+		break;
+	case 'D':
+		DegreeUp = down ? (DegreeUp | 1) : (DegreeUp & ~1);
+		break;
+
+	default:
+		break;
+	}
+}
+
+void UpdateCameraPosition(XMVECTOR & camPos)
+{
+	XMVECTOR updateVector = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	if (MoveForward) updateVector += XMVectorSet(0.0f, 0.0f, 0.02f, 0.0f);
+	if (MoveBack) updateVector += XMVectorSet(0.0f, 0.0f, -0.02f, 0.0f);
+	if (MoveRight) updateVector += XMVectorSet(0.02f, 0.0f, 0.0f, 0.0f);
+	if (MoveLeft) updateVector += XMVectorSet(-0.02f, 0.0f, 0.0f, 0.0f);
+	camPos += updateVector;
+}
+
+void UpdateRadiusAndAngle(float &radius, float &halfAngle)
+{
+	if (RadiusDown) radius -= 0.1f;
+	if (RadiusUp) radius += 0.1f;
+	if (DegreeDown) halfAngle -= 0.2f;
+	if (DegreeUp) halfAngle += 0.2f;
+	if (halfAngle >= 180) halfAngle = 180;
 }
