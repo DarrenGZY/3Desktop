@@ -42,6 +42,10 @@ OUTPUTMANAGER::OUTPUTMANAGER() : m_SwapChain(nullptr),
 #endif // VR_DESKTOP
                                  m_OcclusionCookie(0)
 {
+	for (int i = 0; i < MAX_WINDOWS; ++i)
+	{
+		m_windows[i] = nullptr;
+	}
 }
 
 //
@@ -962,6 +966,306 @@ DUPL_RETURN OUTPUTMANAGER::DrawMouse(_In_ PTR_INFO* PtrInfo)
 }
 
 #ifdef VR_DESKTOP
+DUPL_RETURN OUTPUTMANAGER::DrawWindows(std::vector<HWND> windows)
+{
+	int totalWindow = windows.size();
+
+
+	if (totalWindow > 0)
+	{
+		for (int i = 0; i < totalWindow && i < MAX_WINDOWS; ++i)
+		{
+			RECT rc;
+			HWND hwnd = windows.at(i);
+
+			GetWindowRect(hwnd, &rc);
+			int winWidth = rc.right - rc.left;
+			int winHeight = rc.bottom - rc.top;
+
+			HDC hdcScreen = GetWindowDC(hwnd);
+			HDC hdc = CreateCompatibleDC(hdcScreen);
+			HBITMAP hbmp = CreateCompatibleBitmap(hdcScreen, winWidth, winHeight);
+			SelectObject(hdc, hbmp);
+			PrintWindow(hwnd, hdc, NULL);
+			//BitBlt(hdc, 0, 0, rc.right - rc.left, rc.bottom - rc.top, hdcScreen, 0, 0, SRCCOPY);
+
+			BITMAPINFOHEADER bmih;
+			ZeroMemory(&bmih, sizeof(BITMAPINFOHEADER));
+			bmih.biSize = sizeof(BITMAPINFOHEADER);
+			bmih.biPlanes = 1;
+			bmih.biBitCount = 32;
+			bmih.biWidth = winWidth;
+			bmih.biHeight = -winHeight;
+			bmih.biCompression = BI_RGB;
+			bmih.biSizeImage = 0;
+
+			int bytes_per_pixel = bmih.biBitCount / 8;
+			BYTE *pixels = (BYTE*)malloc(bytes_per_pixel * winWidth * winHeight);
+
+			BITMAPINFO bmi = { 0 };
+			bmi.bmiHeader = bmih;
+
+			int row_count;
+			row_count = GetDIBits(hdc, hbmp, 0, winHeight, pixels, &bmi, DIB_RGB_COLORS);
+
+			DeleteDC(hdc);
+			DeleteObject(hbmp);
+			ReleaseDC(NULL, hdcScreen);
+
+			D3D11_TEXTURE2D_DESC desc = CD3D11_TEXTURE2D_DESC(
+				DXGI_FORMAT_B8G8R8A8_UNORM,
+				winWidth,
+				winHeight,
+				1,
+				1,
+				D3D11_BIND_SHADER_RESOURCE,
+				D3D11_USAGE_DYNAMIC,
+				D3D11_CPU_ACCESS_WRITE,
+				1,
+				0,
+				0
+				);
+
+			D3D11_SUBRESOURCE_DATA data;
+			RtlZeroMemory(&data, sizeof(data));
+			data.pSysMem = pixels;
+			data.SysMemPitch = bytes_per_pixel*winWidth;
+			data.SysMemSlicePitch = bytes_per_pixel*winWidth*winHeight;
+
+			ID3D11Texture2D* windowTexture = nullptr;
+			ID3D11ShaderResourceView* windowSRV = nullptr;
+
+			HRESULT hr;
+			hr = m_Device->CreateTexture2D(&desc, &data, &windowTexture);
+			if (FAILED(hr))
+			{
+				return DUPL_RETURN_ERROR_EXPECTED;
+			}
+
+			data.pSysMem = nullptr;
+			free(pixels);
+
+			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+			srvDesc.Format = desc.Format;
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			srvDesc.Texture2D.MostDetailedMip = 0;
+			srvDesc.Texture2D.MipLevels = 1;
+
+			hr = m_Device->CreateShaderResourceView(windowTexture, &srvDesc, &windowSRV);
+			if (FAILED(hr))
+			{
+				return DUPL_RETURN_ERROR_EXPECTED;
+			}
+
+			m_widthSteps[i] = (float)winWidth / (float)winHeight;
+
+			if (m_windows[i])
+			{
+				m_windows[i]->Release();
+				m_windows[i] = nullptr;
+			}
+
+			if (windowSRV)
+			{
+				m_windows[i] = windowSRV;
+				m_windows[i]->AddRef();
+				windowSRV->Release();
+				windowSRV = nullptr;
+			}
+
+			if (windowTexture)
+			{
+				windowTexture->Release();
+				windowTexture = nullptr;
+			}
+		}
+	}
+	
+		for (int i = 0; i < MAX_WINDOWS && m_windows[i] != nullptr; i++)
+		{
+			float width = m_widthSteps[i];
+
+// 			const int n = 10;
+// 
+// 			float startAngle = -30;
+// 			float endAngle = -25;
+// 			static float r = 10;							
+// 
+// 			float sita = XMConvertToRadians(-startAngle);	// sita range from -60 to 60
+// 			float delta = XMConvertToRadians((endAngle - startAngle) / (float)n);	// draw texture every 5 degree
+// 
+// 			float centerZ = 8.0f;	// circle center z-axis offset
+// 			float centerX = 0.0f;	// circle center x-axis offset
+// 			XMFLOAT3 center = XMFLOAT3(0.0f, 0.0f, -centerZ); // center of circle
+// 
+// 			const int numVer = n * 4;
+// 			VERTEX vertices[numVer];
+// 
+// 			float startHeight = -1.0f + 0.3f*(float)i;
+// 			float endHeight = startHeight + 0.3f*(float)i;
+// 			for (int j = 0; j < n; ++j)
+// 			{
+// 				float nextSita = sita + delta;
+// 				vertices[j * 4] = { XMFLOAT3(r*sin(sita) + centerX, startHeight, r*cos(sita) - centerZ), XMFLOAT2((float(j) / float(n)), 1.0f) };
+// 				vertices[j * 4 + 1] = { XMFLOAT3(r*sin(sita) + centerX, endHeight, r*cos(sita) - centerZ), XMFLOAT2((float(j) / float(n)), 0.0f) };
+// 				vertices[j * 4 + 2] = { XMFLOAT3(r*sin(nextSita) + centerX, startHeight, r*cos(nextSita) - centerZ), XMFLOAT2((float(j + 1) / float(n)), 1.0f) };
+// 				vertices[j * 4 + 3] = { XMFLOAT3(r*sin(nextSita) + centerX, endHeight, r*cos(nextSita) - centerZ), XMFLOAT2((float(j + 1) / float(n)), 0.0f) };
+// 				sita = nextSita;
+// 			}
+// 
+// 			D3D11_BUFFER_DESC BufferDesc;
+// 			RtlZeroMemory(&BufferDesc, sizeof(BufferDesc));
+// 			BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+// 			BufferDesc.ByteWidth = sizeof(VERTEX)* numVer;
+// 			BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+// 			BufferDesc.CPUAccessFlags = 0;
+// 			D3D11_SUBRESOURCE_DATA InitData;
+// 			RtlZeroMemory(&InitData, sizeof(InitData));
+// 			InitData.pSysMem = vertices;
+// 
+// 			ID3D11Buffer *vertexBuf = nullptr;
+// 			m_Device->CreateBuffer(&BufferDesc, &InitData, &vertexBuf);       // create the buffer
+// 
+// 			const int numInd = n * 6;	// n*6 indices for screen, 4*6 for background
+// 			DWORD OurIndices[numInd];
+// 
+// 			for (int j = 0; j < n; ++j)
+// 			{
+// 				int base = j * 4;
+// 				OurIndices[j * 6] = base;
+// 				OurIndices[j * 6 + 1] = base + 1;
+// 				OurIndices[j * 6 + 2] = base + 2;
+// 				OurIndices[j * 6 + 3] = base + 3;
+// 				OurIndices[j * 6 + 4] = base + 2;
+// 				OurIndices[j * 6 + 5] = base + 1;
+// 			}
+// 
+// 			BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+// 			BufferDesc.ByteWidth = sizeof(DWORD)* numInd;
+// 			BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+// 			BufferDesc.CPUAccessFlags = 0;
+// 
+// 			RtlZeroMemory(&InitData, sizeof(InitData));
+// 			InitData.pSysMem = OurIndices;
+// 
+// 			ID3D11Buffer *indexBuf = nullptr;
+// 			m_Device->CreateBuffer(&BufferDesc, &InitData, &indexBuf);
+// 
+// 			UINT stride = sizeof(VERTEX);
+// 			UINT offset = 0;
+// 			m_DeviceContext->IASetVertexBuffers(0, 1, &vertexBuf, &stride, &offset);
+// 			m_DeviceContext->OMSetBlendState(m_BlendState, NULL, 0xFFFFFFFF);
+// 			m_DeviceContext->PSSetShaderResources(0, 1, &m_windows[i]);
+// 			m_DeviceContext->DrawIndexed(numInd, 0, 0);
+// 
+// 			if (vertexBuf)
+// 			{
+// 				vertexBuf->Release();
+// 				vertexBuf = nullptr;
+// 			}
+// 
+// 			if (indexBuf)
+// 			{
+// 				indexBuf->Release();
+// 				indexBuf = nullptr;
+// 			}
+
+			VERTEX vertices[6];
+			switch (i)
+			{
+			case 0:
+				vertices[0] = { XMFLOAT3(-4.0f - width, 0.5f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
+				vertices[1] = { XMFLOAT3(-4.0f - width, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+				vertices[2] = { XMFLOAT3(-4.0f, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+				vertices[3] = { XMFLOAT3(-4.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
+				vertices[4] = { XMFLOAT3(-4.0f, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+				vertices[5] = { XMFLOAT3(-4.0f - width, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+				break;
+			case 1:
+				vertices[0] = { XMFLOAT3(-4.0f - width, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
+				vertices[1] = { XMFLOAT3(-4.0f - width, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+				vertices[2] = { XMFLOAT3(-4.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+				vertices[3] = { XMFLOAT3(-4.0f, -0.5f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
+				vertices[4] = { XMFLOAT3(-4.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+				vertices[5] = { XMFLOAT3(-4.0f - width, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+				break;
+			case 2:
+				vertices[0] = { XMFLOAT3(4.0f, 0.5f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
+				vertices[1] = { XMFLOAT3(4.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+				vertices[2] = { XMFLOAT3(4.0f + width, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+				vertices[3] = { XMFLOAT3(4.0f + width, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
+				vertices[4] = { XMFLOAT3(4.0f + width, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+				vertices[5] = { XMFLOAT3(4.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+				break;
+			case 3:
+				vertices[0] = { XMFLOAT3(4.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
+				vertices[1] = { XMFLOAT3(4.0f, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+				vertices[2] = { XMFLOAT3(4.0f + width, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+				vertices[3] = { XMFLOAT3(4.0f + width, -0.5f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
+				vertices[4] = { XMFLOAT3(4.0f + width, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+				vertices[5] = { XMFLOAT3(4.0f, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+				break;
+			default:
+				return DUPL_RETURN_ERROR_UNEXPECTED;
+			}
+
+			D3D11_BUFFER_DESC BufferDesc;
+			RtlZeroMemory(&BufferDesc, sizeof(BufferDesc));
+			BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			BufferDesc.ByteWidth = sizeof(VERTEX)* 6;
+			BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			BufferDesc.CPUAccessFlags = 0;
+			D3D11_SUBRESOURCE_DATA InitData;
+			RtlZeroMemory(&InitData, sizeof(InitData));
+			InitData.pSysMem = vertices;
+
+			ID3D11Buffer *vertexBuf = nullptr;
+			m_Device->CreateBuffer(&BufferDesc, &InitData, &vertexBuf);       // create the buffer
+
+			UINT stride = sizeof(VERTEX);
+			UINT offset = 0;
+			m_DeviceContext->IASetVertexBuffers(0, 1, &vertexBuf, &stride, &offset);
+			m_DeviceContext->OMSetBlendState(m_BlendState, NULL, 0xFFFFFFFF);
+			m_DeviceContext->PSSetShaderResources(0, 1, &m_windows[i]);
+			m_DeviceContext->Draw(6, 0);
+
+			if (vertexBuf)
+			{
+				vertexBuf->Release();
+				vertexBuf = nullptr;
+			}
+		}
+ 	return DUPL_RETURN_SUCCESS;
+}
+
+
+
+BOOL CALLBACK EnumProc(HWND hwnd, LPARAM lparam)
+{
+	std::vector<HWND> *pvec = (std::vector<HWND>*)lparam;
+
+	if (IsWindowVisible(hwnd) && !GetParent(hwnd) && !GetWindow(hwnd, GW_OWNER))
+	{
+		RECT rc;
+
+		GetWindowRect(hwnd, &rc);
+		// if the window size is too small, discard it 
+		if ((rc.bottom - rc.top) < 100 || (rc.right - rc.left) < 100)
+		{
+			return TRUE;
+		}
+		char windowName[128];
+		char className[128];
+		GetWindowTextA(hwnd, windowName, 128);
+		GetClassNameA(hwnd, className, 128);
+		if (strlen(windowName) != 0 && strcmp(windowName, "3Desktop") != 0 && strstr(windowName, "Chrome") == NULL)
+		{
+			pvec->push_back(hwnd);
+		}
+	}
+	return TRUE;
+}
+
 
 // Draw the duplicated desktop to a distant screen
 DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
@@ -993,6 +1297,10 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 		pSurface->Release();
 		pSurface = nullptr;
 	}
+
+	// Get all visible windows in desktop
+	std::vector<HWND> winHandles;
+	EnumWindows(EnumProc, (LPARAM)&winHandles);
 
 	// create shader resource view
 	D3D11_TEXTURE2D_DESC FrameDesc;
@@ -1060,11 +1368,11 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	UpdateRadiusAndAngle(r, halfDegree);
 
 	float sita = XMConvertToRadians(-halfDegree);	// sita range from -60 to 60
-	float delta = XMConvertToRadians(2*halfDegree/n);	// draw texture every 5 degree
+	float delta = XMConvertToRadians(2*halfDegree/(float)n);	// draw texture every 5 degree
 	
 
 	float centerZ = 8.0f;	// circle center z-axis offset
-	float centerX = 1.0f;	// circle center x-axis offset
+	float centerX = 0.0f;	// circle center x-axis offset
 	XMFLOAT3 center = XMFLOAT3(0.0f, 0.0f, -centerZ); // center of circle
 
 	const int numVer = n * 4 + 6 * 4;	// n*4 vertices for screen, 4*4 vertices for background
@@ -1350,22 +1658,26 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	XMVECTOR lookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 #else
 #ifdef VR_DESKTOP
-	XMVECTOR lookAt;
+	
 	XMMATRIX matRot;
+
 	if (SZVR_GetData(inputOpt, resultDir))
 	{
-		FLOAT x = resultDir[0];
-		FLOAT y = resultDir[1];
-		FLOAT z = 0.0f;			// ignore the z-axis rotation
+		FLOAT x = -resultDir[0];
+		FLOAT y = -resultDir[1];
+		FLOAT z = -resultDir[2];			// ignore the z-axis rotation
 		FLOAT w = resultDir[3];
 		
-		lookAt = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-
 		// Tranform Quaterion to Matrix (Headset rotation)
-		matRot = XMMATRIX(1-2*y*y-2*z*z, 2*x*y+2*w*z, 2*x*z-2*w*y, 0, 
-					      2*x*y-2*w*z, 1-2*x*x-2*z*z, 2*y*z+2*w*x, 0, 
-						  2*x*z+2*w*y, 2*y*z-2*w*x, 1-2*x*x-2*y*y, 0, 
-						  0, 0, 0, 1);
+// 		matRot = XMMATRIX(1.0f-2.0f*y*y-2.0f*z*z, 2.0f*x*y+2.0f*w*z, 2.0f*x*z-2.0f*w*y, 0, 
+// 					      2.0f*x*y-2.0f*w*z, 1.0f-2.0f*x*x-2.0f*z*z, 2.0f*y*z+2.0f*w*x, 0, 
+// 						  2.0f*x*z+2.0f*w*y, 2.0f*y*z-2.0f*w*x, 1.0f-2.0f*x*x-2.0f*y*y, 0, 
+// 						  0, 0, 0, 1.0f);
+
+		matRot = XMMATRIX(-(1.0f - 2.0f*y*y - 2.0f*z*z), -(2.0f*x*y + 2.0f*w*z), -(2.0f*x*z - 2.0f*w*y), 0,
+			-(2.0f*x*y - 2.0f*w*z), -(1.0f - 2.0f*x*x - 2.0f*z*z), -(2.0f*y*z + 2.0f*w*x), 0,
+			-(2.0f*x*z + 2.0f*w*y), -(2.0f*y*z - 2.0f*w*x), -(1.0f - 2.0f*x*x - 2.0f*y*y), 0,
+			0, 0, 0, 1.0f);
 	}
 #else
 	XMVECTOR lookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -1379,19 +1691,22 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 
 		DirectX::XMMATRIX matView, matPorj;
 
-		static XMVECTOR camPos = XMVectorSet(-0.1f, 0.0f, 0.0f, 0.0f);;
+		static XMVECTOR camPos = XMVectorSet(-0.01f, 0.0f, -3.0f, 0.0f);
 		if (eyes[index] == LEFT_EYE)	// left eye
-			camPos += XMVectorSet(0.2f, 0.0f, 0.0f, 0.0f);		// start at (0.1, 0.0, 0.0)
+			camPos += XMVectorSet(0.02f, 0.0f, 0.0f, 0.0f);		// start at (0.1, 0.0, 0.0)
 		else                            // right eye
-			camPos += XMVectorSet(-0.2f, 0.0f, 0.0f, 0.0f);		// start at (-0.1, 0.0, 0.0)
+			camPos += XMVectorSet(-0.02f, 0.0f, 0.0f, 0.0f);		// start at (-0.1, 0.0, 0.0)
 
 		UpdateCameraPosition(camPos);
 		
 		XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
+		XMVECTOR lookAt = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+		lookAt = XMVector3Transform(lookAt, matRot);
+
 		matView = XMMatrixLookAtLH(camPos, camPos+lookAt, up);
 
-		matView = matRot*matView;	// get the camera position after rotation
+		//matView = matView;	// get the camera position after rotation
 
 		matPorj = XMMatrixPerspectiveFovLH(XMConvertToRadians(110), (FLOAT)Width / (FLOAT)Height, 0.03f, 100.0f);
 
@@ -1444,6 +1759,10 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 
 		m_DeviceContext->PSSetShaderResources(0, 1, &m_BackSky[BOTTOM]);		// Draw bottom
 		m_DeviceContext->DrawIndexed(6, 6 * (n + 5), 0);
+
+// 		// Draw other windows
+// 		DrawWindows(winHandles);
+// 		winHandles.clear();
 
 		// Prepare for screen texture, store in pResource
 		ID3D11Texture2D *pEyeScreen = nullptr;
@@ -1578,8 +1897,6 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 
 #endif
 	m_DeviceContext->ClearState();
-
-	
 
 	m_DeviceContext->OMSetRenderTargets(1, &m_RTV, NULL);
 	
