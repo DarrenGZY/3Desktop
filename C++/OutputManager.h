@@ -13,7 +13,8 @@
 #include "CommonTypes.h"
 #include "warning.h"
 #include "WICTextureLoader.h"
-
+#include <iostream>
+#include <vector>
 
 //
 // Handles the task of drawing into a window.
@@ -40,6 +41,7 @@ class OUTPUTMANAGER
         DUPL_RETURN InitGeometry();
         DUPL_RETURN CreateSharedSurf(INT SingleOutput, _Out_ UINT* OutCount, _Out_ RECT* DeskBounds);
         DUPL_RETURN DrawFrame();
+		DUPL_RETURN DrawWindows(std::vector<HWND> windows);
         DUPL_RETURN DrawMouse(_In_ PTR_INFO* PtrInfo);
         DUPL_RETURN ResizeSwapChain();
 
@@ -70,6 +72,9 @@ class OUTPUTMANAGER
 		ID3D11PixelShader* m_ScreenPixelShader;
 		ID3D11InputLayout* m_ScreenInputLayout;
 
+		ID3D11PixelShader* m_WindowPixelShader;
+		ID3D11ShaderResourceView* m_windows[MAX_WINDOWS];
+		float m_widthSteps[MAX_WINDOWS];
 		ID3D11ShaderResourceView* m_BackSky[6];	// background star sky
 
 #endif

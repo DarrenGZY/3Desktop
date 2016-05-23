@@ -19,7 +19,7 @@ float4 PS(PS_INPUT input) : SV_Target
 
 	float scale = 1 + 0.22*rsq + 0.24*rsq*rsq;
 
-	float2 distortedndc = ndc * scale + 0.1;
+	float2 distortedndc = ndc * scale;
 
 	float2 distorteduv = (distortedndc + 1)*0.5;
 

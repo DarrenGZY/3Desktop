@@ -26,6 +26,7 @@
 #ifdef VR_DESKTOP
 #include "VertexShader1.h"
 #include "PixelShader1.h"
+#include "PixelShader2.h"
 #endif // VR_DESKTOP
 
 
@@ -148,6 +149,8 @@ enum Eye_Type
 #define  RIGHT 3
 #define  TOP 4
 #define  BOTTOM 5
+
+#define  MAX_WINDOWS 3
 
 #endif // VR_DESKTOP
 

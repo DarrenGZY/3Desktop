@@ -24,6 +24,8 @@ unsigned char	MoveForward = 0,
 MoveBack = 0,
 MoveLeft = 0,
 MoveRight = 0,
+MoveUp = 0,
+MoveDown = 0,
 DegreeUp = 0,
 DegreeDown = 0,
 RadiusUp = 0,
@@ -241,7 +243,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         return 0;
     }
 #ifdef VR_DESKTOP
-	RECT WindowRect = { 0, 0, 2880, 1440 };
+	RECT WindowRect = { 0, 0, 2560, 1440 };
 #else
 	RECT WindowRect = { 0, 0, 800, 600 };
 #endif // VR_DESKTOP
@@ -249,7 +251,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     
     //AdjustWindowRect(&WindowRect, WS_OVERLAPPEDWINDOW, FALSE);
 #ifdef VR_DESKTOP
-	WindowHandle = CreateWindowW(L"ddasample", L"DXGI desktop duplication sample",
+	WindowHandle = CreateWindowW(L"ddasample", L"3Desktop",
 		WS_OVERLAPPEDWINDOW,
 		1910, 0,
 		WindowRect.right - WindowRect.left - 1910, WindowRect.bottom - WindowRect.top,	// Need to minus 1910, dont know why
@@ -769,7 +771,12 @@ void OnKey(unsigned vk, bool down)
 	case 'D':
 		DegreeUp = down ? (DegreeUp | 1) : (DegreeUp & ~1);
 		break;
-
+	case 'Q':
+		MoveUp = down ? (MoveUp | 1) : (MoveUp & ~1); 
+		break;
+	case 'E':
+		MoveDown = down ? (MoveDown | 1) : (MoveDown & ~1);
+		break;
 	default:
 		break;
 	}
@@ -782,6 +789,8 @@ void UpdateCameraPosition(XMVECTOR & camPos)
 	if (MoveBack) updateVector += XMVectorSet(0.0f, 0.0f, -0.02f, 0.0f);
 	if (MoveRight) updateVector += XMVectorSet(0.02f, 0.0f, 0.0f, 0.0f);
 	if (MoveLeft) updateVector += XMVectorSet(-0.02f, 0.0f, 0.0f, 0.0f);
+	if (MoveUp) updateVector += XMVectorSet(0.0f, 0.02f, 0.0f, 0.0f);
+	if (MoveDown) updateVector += XMVectorSet(0.0f, -0.02f, 0.0f, 0.0f);
 	camPos += updateVector;
 }
 

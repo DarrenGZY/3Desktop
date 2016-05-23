@@ -970,7 +970,6 @@ DUPL_RETURN OUTPUTMANAGER::DrawWindows(std::vector<HWND> windows)
 {
 	int totalWindow = windows.size();
 
-
 	if (totalWindow > 0)
 	{
 		for (int i = 0; i < totalWindow && i < MAX_WINDOWS; ++i)
@@ -1085,134 +1084,37 @@ DUPL_RETURN OUTPUTMANAGER::DrawWindows(std::vector<HWND> windows)
 		{
 			float width = m_widthSteps[i];
 
-// 			const int n = 10;
-// 
-// 			float startAngle = -30;
-// 			float endAngle = -25;
-// 			static float r = 10;							
-// 
-// 			float sita = XMConvertToRadians(-startAngle);	// sita range from -60 to 60
-// 			float delta = XMConvertToRadians((endAngle - startAngle) / (float)n);	// draw texture every 5 degree
-// 
-// 			float centerZ = 8.0f;	// circle center z-axis offset
-// 			float centerX = 0.0f;	// circle center x-axis offset
-// 			XMFLOAT3 center = XMFLOAT3(0.0f, 0.0f, -centerZ); // center of circle
-// 
-// 			const int numVer = n * 4;
-// 			VERTEX vertices[numVer];
-// 
-// 			float startHeight = -1.0f + 0.3f*(float)i;
-// 			float endHeight = startHeight + 0.3f*(float)i;
-// 			for (int j = 0; j < n; ++j)
-// 			{
-// 				float nextSita = sita + delta;
-// 				vertices[j * 4] = { XMFLOAT3(r*sin(sita) + centerX, startHeight, r*cos(sita) - centerZ), XMFLOAT2((float(j) / float(n)), 1.0f) };
-// 				vertices[j * 4 + 1] = { XMFLOAT3(r*sin(sita) + centerX, endHeight, r*cos(sita) - centerZ), XMFLOAT2((float(j) / float(n)), 0.0f) };
-// 				vertices[j * 4 + 2] = { XMFLOAT3(r*sin(nextSita) + centerX, startHeight, r*cos(nextSita) - centerZ), XMFLOAT2((float(j + 1) / float(n)), 1.0f) };
-// 				vertices[j * 4 + 3] = { XMFLOAT3(r*sin(nextSita) + centerX, endHeight, r*cos(nextSita) - centerZ), XMFLOAT2((float(j + 1) / float(n)), 0.0f) };
-// 				sita = nextSita;
-// 			}
-// 
-// 			D3D11_BUFFER_DESC BufferDesc;
-// 			RtlZeroMemory(&BufferDesc, sizeof(BufferDesc));
-// 			BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-// 			BufferDesc.ByteWidth = sizeof(VERTEX)* numVer;
-// 			BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-// 			BufferDesc.CPUAccessFlags = 0;
-// 			D3D11_SUBRESOURCE_DATA InitData;
-// 			RtlZeroMemory(&InitData, sizeof(InitData));
-// 			InitData.pSysMem = vertices;
-// 
-// 			ID3D11Buffer *vertexBuf = nullptr;
-// 			m_Device->CreateBuffer(&BufferDesc, &InitData, &vertexBuf);       // create the buffer
-// 
-// 			const int numInd = n * 6;	// n*6 indices for screen, 4*6 for background
-// 			DWORD OurIndices[numInd];
-// 
-// 			for (int j = 0; j < n; ++j)
-// 			{
-// 				int base = j * 4;
-// 				OurIndices[j * 6] = base;
-// 				OurIndices[j * 6 + 1] = base + 1;
-// 				OurIndices[j * 6 + 2] = base + 2;
-// 				OurIndices[j * 6 + 3] = base + 3;
-// 				OurIndices[j * 6 + 4] = base + 2;
-// 				OurIndices[j * 6 + 5] = base + 1;
-// 			}
-// 
-// 			BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-// 			BufferDesc.ByteWidth = sizeof(DWORD)* numInd;
-// 			BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-// 			BufferDesc.CPUAccessFlags = 0;
-// 
-// 			RtlZeroMemory(&InitData, sizeof(InitData));
-// 			InitData.pSysMem = OurIndices;
-// 
-// 			ID3D11Buffer *indexBuf = nullptr;
-// 			m_Device->CreateBuffer(&BufferDesc, &InitData, &indexBuf);
-// 
-// 			UINT stride = sizeof(VERTEX);
-// 			UINT offset = 0;
-// 			m_DeviceContext->IASetVertexBuffers(0, 1, &vertexBuf, &stride, &offset);
-// 			m_DeviceContext->OMSetBlendState(m_BlendState, NULL, 0xFFFFFFFF);
-// 			m_DeviceContext->PSSetShaderResources(0, 1, &m_windows[i]);
-// 			m_DeviceContext->DrawIndexed(numInd, 0, 0);
-// 
-// 			if (vertexBuf)
-// 			{
-// 				vertexBuf->Release();
-// 				vertexBuf = nullptr;
-// 			}
-// 
-// 			if (indexBuf)
-// 			{
-// 				indexBuf->Release();
-// 				indexBuf = nullptr;
-// 			}
+			const int n = 10;
 
-			VERTEX vertices[6];
-			switch (i)
+			float startAngle = -30;
+			float endAngle = -25;
+			static float r = 10;							
+
+			float sita = XMConvertToRadians(-startAngle);	// sita range from -60 to 60
+			float delta = XMConvertToRadians((endAngle - startAngle) / (float)n);	// draw texture every 5 degree
+
+			float centerZ = 8.0f;	// circle center z-axis offset
+			float centerX = 0.0f;	// circle center x-axis offset
+
+			const int numVer = n * 4;
+			VERTEX vertices[numVer];
+
+			float startHeight = -1.0f + 0.5f*(float)i;
+			float endHeight = startHeight + 0.5f;
+			for (int j = 0; j < n; ++j)
 			{
-			case 0:
-				vertices[0] = { XMFLOAT3(-4.0f - width, 0.5f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
-				vertices[1] = { XMFLOAT3(-4.0f - width, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
-				vertices[2] = { XMFLOAT3(-4.0f, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
-				vertices[3] = { XMFLOAT3(-4.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
-				vertices[4] = { XMFLOAT3(-4.0f, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
-				vertices[5] = { XMFLOAT3(-4.0f - width, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
-				break;
-			case 1:
-				vertices[0] = { XMFLOAT3(-4.0f - width, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
-				vertices[1] = { XMFLOAT3(-4.0f - width, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
-				vertices[2] = { XMFLOAT3(-4.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
-				vertices[3] = { XMFLOAT3(-4.0f, -0.5f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
-				vertices[4] = { XMFLOAT3(-4.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
-				vertices[5] = { XMFLOAT3(-4.0f - width, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
-				break;
-			case 2:
-				vertices[0] = { XMFLOAT3(4.0f, 0.5f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
-				vertices[1] = { XMFLOAT3(4.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
-				vertices[2] = { XMFLOAT3(4.0f + width, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
-				vertices[3] = { XMFLOAT3(4.0f + width, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
-				vertices[4] = { XMFLOAT3(4.0f + width, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
-				vertices[5] = { XMFLOAT3(4.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
-				break;
-			case 3:
-				vertices[0] = { XMFLOAT3(4.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
-				vertices[1] = { XMFLOAT3(4.0f, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
-				vertices[2] = { XMFLOAT3(4.0f + width, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
-				vertices[3] = { XMFLOAT3(4.0f + width, -0.5f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
-				vertices[4] = { XMFLOAT3(4.0f + width, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
-				vertices[5] = { XMFLOAT3(4.0f, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
-				break;
-			default:
-				return DUPL_RETURN_ERROR_UNEXPECTED;
+				float nextSita = sita + delta;
+				vertices[j * 4] = { XMFLOAT3(r*sin(sita) + centerX, startHeight, r*cos(sita) - centerZ), XMFLOAT2((float(j) / float(n)), 1.0f) };
+				vertices[j * 4 + 1] = { XMFLOAT3(r*sin(sita) + centerX, endHeight, r*cos(sita) - centerZ), XMFLOAT2((float(j) / float(n)), 0.0f) };
+				vertices[j * 4 + 2] = { XMFLOAT3(r*sin(nextSita) + centerX, startHeight, r*cos(nextSita) - centerZ), XMFLOAT2((float(j + 1) / float(n)), 1.0f) };
+				vertices[j * 4 + 3] = { XMFLOAT3(r*sin(nextSita) + centerX, endHeight, r*cos(nextSita) - centerZ), XMFLOAT2((float(j + 1) / float(n)), 0.0f) };
+				sita = nextSita;
 			}
 
 			D3D11_BUFFER_DESC BufferDesc;
 			RtlZeroMemory(&BufferDesc, sizeof(BufferDesc));
 			BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			BufferDesc.ByteWidth = sizeof(VERTEX)* 6;
+			BufferDesc.ByteWidth = sizeof(VERTEX)* numVer;
 			BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 			BufferDesc.CPUAccessFlags = 0;
 			D3D11_SUBRESOURCE_DATA InitData;
@@ -1222,18 +1124,116 @@ DUPL_RETURN OUTPUTMANAGER::DrawWindows(std::vector<HWND> windows)
 			ID3D11Buffer *vertexBuf = nullptr;
 			m_Device->CreateBuffer(&BufferDesc, &InitData, &vertexBuf);       // create the buffer
 
+			const int numInd = n * 6;	// n*6 indices for screen, 4*6 for background
+			DWORD OurIndices[numInd];
+
+			for (int j = 0; j < n; ++j)
+			{
+				int base = j * 4;
+				OurIndices[j * 6] = base;
+				OurIndices[j * 6 + 1] = base + 1;
+				OurIndices[j * 6 + 2] = base + 2;
+				OurIndices[j * 6 + 3] = base + 3;
+				OurIndices[j * 6 + 4] = base + 2;
+				OurIndices[j * 6 + 5] = base + 1;
+			}
+
+			BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			BufferDesc.ByteWidth = sizeof(DWORD)* numInd;
+			BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			BufferDesc.CPUAccessFlags = 0;
+
+			RtlZeroMemory(&InitData, sizeof(InitData));
+			InitData.pSysMem = OurIndices;
+
+			ID3D11Buffer *indexBuf = nullptr;
+			m_Device->CreateBuffer(&BufferDesc, &InitData, &indexBuf);
+
 			UINT stride = sizeof(VERTEX);
 			UINT offset = 0;
 			m_DeviceContext->IASetVertexBuffers(0, 1, &vertexBuf, &stride, &offset);
 			m_DeviceContext->OMSetBlendState(m_BlendState, NULL, 0xFFFFFFFF);
+			m_DeviceContext->PSSetShader(m_WindowPixelShader, NULL, NULL);
 			m_DeviceContext->PSSetShaderResources(0, 1, &m_windows[i]);
-			m_DeviceContext->Draw(6, 0);
+			m_DeviceContext->DrawIndexed(numInd, 0, 0);
 
 			if (vertexBuf)
 			{
 				vertexBuf->Release();
 				vertexBuf = nullptr;
 			}
+
+			if (indexBuf)
+			{
+				indexBuf->Release();
+				indexBuf = nullptr;
+			}
+
+// 			VERTEX vertices[6];
+// 			switch (i)
+// 			{
+// 			case 0:
+// 				vertices[0] = { XMFLOAT3(-4.0f - width, 0.5f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
+// 				vertices[1] = { XMFLOAT3(-4.0f - width, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+// 				vertices[2] = { XMFLOAT3(-4.0f, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+// 				vertices[3] = { XMFLOAT3(-4.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
+// 				vertices[4] = { XMFLOAT3(-4.0f, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+// 				vertices[5] = { XMFLOAT3(-4.0f - width, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+// 				break;
+// 			case 1:
+// 				vertices[0] = { XMFLOAT3(-4.0f - width, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
+// 				vertices[1] = { XMFLOAT3(-4.0f - width, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+// 				vertices[2] = { XMFLOAT3(-4.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+// 				vertices[3] = { XMFLOAT3(-4.0f, -0.5f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
+// 				vertices[4] = { XMFLOAT3(-4.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+// 				vertices[5] = { XMFLOAT3(-4.0f - width, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+// 				break;
+// 			case 2:
+// 				vertices[0] = { XMFLOAT3(4.0f, 0.5f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
+// 				vertices[1] = { XMFLOAT3(4.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+// 				vertices[2] = { XMFLOAT3(4.0f + width, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+// 				vertices[3] = { XMFLOAT3(4.0f + width, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
+// 				vertices[4] = { XMFLOAT3(4.0f + width, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+// 				vertices[5] = { XMFLOAT3(4.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+// 				break;
+// 			case 3:
+// 				vertices[0] = { XMFLOAT3(4.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) };
+// 				vertices[1] = { XMFLOAT3(4.0f, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+// 				vertices[2] = { XMFLOAT3(4.0f + width, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+// 				vertices[3] = { XMFLOAT3(4.0f + width, -0.5f, 0.0f), XMFLOAT2(1.0f, 0.0f) };
+// 				vertices[4] = { XMFLOAT3(4.0f + width, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) };
+// 				vertices[5] = { XMFLOAT3(4.0f, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f) };
+// 				break;
+// 			default:
+// 				return DUPL_RETURN_ERROR_UNEXPECTED;
+// 			}
+// 
+// 			D3D11_BUFFER_DESC BufferDesc;
+// 			RtlZeroMemory(&BufferDesc, sizeof(BufferDesc));
+// 			BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+// 			BufferDesc.ByteWidth = sizeof(VERTEX)* 6;
+// 			BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+// 			BufferDesc.CPUAccessFlags = 0;
+// 			D3D11_SUBRESOURCE_DATA InitData;
+// 			RtlZeroMemory(&InitData, sizeof(InitData));
+// 			InitData.pSysMem = vertices;
+// 
+// 			ID3D11Buffer *vertexBuf = nullptr;
+// 			m_Device->CreateBuffer(&BufferDesc, &InitData, &vertexBuf);       // create the buffer
+// 
+// 			UINT stride = sizeof(VERTEX);
+// 			UINT offset = 0;
+// 			m_DeviceContext->IASetVertexBuffers(0, 1, &vertexBuf, &stride, &offset);
+// 			m_DeviceContext->OMSetBlendState(m_BlendState, NULL, 0xFFFFFFFF);
+// 			m_DeviceContext->PSSetShader(m_WindowPixelShader, NULL, NULL);
+// 			m_DeviceContext->PSSetShaderResources(0, 1, &m_windows[i]);
+// 			m_DeviceContext->Draw(6, 0);
+// 
+// 			if (vertexBuf)
+// 			{
+// 				vertexBuf->Release();
+// 				vertexBuf = nullptr;
+// 			}
 		}
  	return DUPL_RETURN_SUCCESS;
 }
@@ -1328,40 +1328,12 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 		m_ScreenTex = nullptr;
 	}
 
-	// create the vertex buffer
-#ifdef DEBUG_VERTEX
-	// Vertices for drawing whole texture
-	VERTEX Vertices[NUMVERTICES] =
-	{
-		{ XMFLOAT3(-1.0f, -1.0f, 0), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 0), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, 0), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, 0), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 0), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, 0), XMFLOAT2(1.0f, 0.0f) },
-	};
-
-	D3D11_BUFFER_DESC BufferDesc;
-	RtlZeroMemory(&BufferDesc, sizeof(BufferDesc));
-	BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	BufferDesc.ByteWidth = sizeof(VERTEX)* NUMVERTICES;
-	BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	BufferDesc.CPUAccessFlags = 0;
-	D3D11_SUBRESOURCE_DATA InitData;
-	RtlZeroMemory(&InitData, sizeof(InitData));
-	InitData.pSysMem = Vertices;
-
-	ID3D11Buffer* VertexBuffer = nullptr;
-
-	// Create vertex buffer
-	hr = m_Device->CreateBuffer(&BufferDesc, &InitData, &VertexBuffer);
-#else
-
-	ID3D11Buffer *pVBuffer = nullptr;		// TODO: Dont forget to release
+//--------------------Create Vertex buffer and Index Buffer----------------------
+	ID3D11Buffer *pVBuffer = nullptr;		
 	ID3D11Buffer *pIBuffer = nullptr;
 
 
-	const int n = 400;
+	const int n = 40;
 	
 	static float halfDegree = 25;
 	static float r = 10;							// radius
@@ -1428,36 +1400,7 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	OurVertices[startInd + 2] = { XMFLOAT3(len, -len, -len), XMFLOAT2(1.0f, 1.0f) };
 	OurVertices[startInd + 3] = { XMFLOAT3(len, -len, len), XMFLOAT2(1.0f, 0.0f) };
 
-// 	VERTEX OurVertices[] =
-// 	{
-// 		{ XMFLOAT3(-2.5f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) },
-// 		{ XMFLOAT3(-2.5f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
-// 		{ XMFLOAT3(2.5f, -1.0f, 0.0f),XMFLOAT2(1.0f, 1.0f) },
-// 		{ XMFLOAT3(2.5f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
-// 	};
 
-#ifndef DEBUG_MAP
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
-
-	bd.Usage = D3D11_USAGE_DYNAMIC;                // write access access by CPU and GPU
-	bd.ByteWidth = sizeof(VERTEX)* 4;              // size is the VERTEX struct * 4
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       // use as a vertex buffer
-	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;    // allow CPU to write in buffer
-
-	hr = m_Device->CreateBuffer(&bd, NULL, &pVBuffer);       // create the buffer
-	if (FAILED(hr))
-	{
-		return ProcessFailure(m_Device, L"Failed to create shader resource when drawing a frame(in screen)", L"Error", hr, SystemTransitionsExpectedErrors);
-	}
-
-	// copy the vertices into the buffer
-	D3D11_MAPPED_SUBRESOURCE ms;
-	m_DeviceContext->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);    // map the buffer
-	memcpy(ms.pData, OurVertices, sizeof(OurVertices));                 // copy the data
-	m_DeviceContext->Unmap(pVBuffer, NULL);                                      // unmap the buffer
-
-#else
 	D3D11_BUFFER_DESC BufferDesc;
 	RtlZeroMemory(&BufferDesc, sizeof(BufferDesc));
 	BufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -1469,7 +1412,7 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	InitData.pSysMem = OurVertices;
 	
 	hr = m_Device->CreateBuffer(&BufferDesc, &InitData, &pVBuffer);       // create the buffer
-#endif
+
 	
 	const int numInd = n * 6 + 6 * 6;	// n*6 indices for screen, 4*6 for background
 	DWORD OurIndices[numInd];
@@ -1547,30 +1490,7 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	OurIndices[startInd + 4] = base + 2;
 	OurIndices[startInd + 5] = base + 1;
 
-// 	DWORD OurIndices[] =
-// 	{
-// 		0, 1, 2,
-// 		3, 2, 1,
-// 	};
 
-#ifndef DEBUG_MAP
-	// create the index buffer
-	bd.Usage = D3D11_USAGE_DYNAMIC;
-	bd.ByteWidth = sizeof(DWORD)* 6;
-	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	bd.MiscFlags = 0;
-
-	hr = m_Device->CreateBuffer(&bd, NULL, &pIBuffer);
-	if (FAILED(hr))
-	{
-		return ProcessFailure(m_Device, L"Failed to create shader resource when drawing a frame(in screen)", L"Error", hr, SystemTransitionsExpectedErrors);
-	}
-
-	m_DeviceContext->Map(pIBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);    // map the buffer
-	memcpy(ms.pData, OurIndices, sizeof(OurIndices));                   // copy the data
-	m_DeviceContext->Unmap(pIBuffer, NULL);
-#else
 	BufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	BufferDesc.ByteWidth = sizeof(DWORD)* numInd;
 	BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -1580,8 +1500,8 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	InitData.pSysMem = OurIndices;
 	
 	hr = m_Device->CreateBuffer(&BufferDesc, &InitData, &pIBuffer);
-#endif
-#endif
+
+//------------------------Create Z-buffer----------------------------
 	// Get window size
 	RECT WindowRect;
 	GetClientRect(m_WindowHandle, &WindowRect);
@@ -1589,7 +1509,7 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	UINT Height = WindowRect.bottom - WindowRect.top;
 
 	// Initialize zbuffer
-	ID3D11DepthStencilView *zbuffer = nullptr;	// TODO: Dont forget to release
+	ID3D11DepthStencilView *zbuffer = nullptr;	
 
 	D3D11_TEXTURE2D_DESC texd;
 	ZeroMemory(&texd, sizeof(texd));
@@ -1628,8 +1548,8 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 		pDepthBuffer = nullptr;
 	}
 	
-	// create constant buffer
-	ID3D11Buffer *pCBuffer = nullptr;		// TODO: Dont forget to release
+// --------------------Create constant buffer ------------------------
+	ID3D11Buffer *pCBuffer = nullptr;		
 
 	D3D11_BUFFER_DESC consBufferDesc;
 	ZeroMemory(&consBufferDesc, sizeof(consBufferDesc));
@@ -1653,11 +1573,6 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	// Outside of for loop, in case of directions of two eye are not the same
 	float inputOpt[1] = { 1 };
 	float resultDir[4] = { 0, 0, 0, 0 };
-
-#ifdef DEBUG_LIB
-	XMVECTOR lookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-#else
-#ifdef VR_DESKTOP
 	
 	XMMATRIX matRot;
 
@@ -1669,20 +1584,12 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 		FLOAT w = resultDir[3];
 		
 		// Tranform Quaterion to Matrix (Headset rotation)
-// 		matRot = XMMATRIX(1.0f-2.0f*y*y-2.0f*z*z, 2.0f*x*y+2.0f*w*z, 2.0f*x*z-2.0f*w*y, 0, 
-// 					      2.0f*x*y-2.0f*w*z, 1.0f-2.0f*x*x-2.0f*z*z, 2.0f*y*z+2.0f*w*x, 0, 
-// 						  2.0f*x*z+2.0f*w*y, 2.0f*y*z-2.0f*w*x, 1.0f-2.0f*x*x-2.0f*y*y, 0, 
-// 						  0, 0, 0, 1.0f);
-
-		matRot = XMMATRIX(-(1.0f - 2.0f*y*y - 2.0f*z*z), -(2.0f*x*y + 2.0f*w*z), -(2.0f*x*z - 2.0f*w*y), 0,
-			-(2.0f*x*y - 2.0f*w*z), -(1.0f - 2.0f*x*x - 2.0f*z*z), -(2.0f*y*z + 2.0f*w*x), 0,
-			-(2.0f*x*z + 2.0f*w*y), -(2.0f*y*z - 2.0f*w*x), -(1.0f - 2.0f*x*x - 2.0f*y*y), 0,
-			0, 0, 0, 1.0f);
+		matRot = XMMATRIX(1.0f-2.0f*y*y-2.0f*z*z, 2.0f*x*y+2.0f*w*z, 2.0f*x*z-2.0f*w*y, 0, 
+					      2.0f*x*y-2.0f*w*z, 1.0f-2.0f*x*x-2.0f*z*z, 2.0f*y*z+2.0f*w*x, 0, 
+						  2.0f*x*z+2.0f*w*y, 2.0f*y*z-2.0f*w*x, 1.0f-2.0f*x*x-2.0f*y*y, 0, 
+						  0, 0, 0, 1.0f);
 	}
-#else
-	XMVECTOR lookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-#endif // VR_DESKTOP
-#endif // DEBUG_LIB
+
 
 	for (int index = 0; index < 2; ++index)
 	{
@@ -1701,7 +1608,7 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 		
 		XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-		XMVECTOR lookAt = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+		XMVECTOR lookAt = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 		lookAt = XMVector3Transform(lookAt, matRot);
 
 		matView = XMMatrixLookAtLH(camPos, camPos+lookAt, up);
@@ -1760,9 +1667,9 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 		m_DeviceContext->PSSetShaderResources(0, 1, &m_BackSky[BOTTOM]);		// Draw bottom
 		m_DeviceContext->DrawIndexed(6, 6 * (n + 5), 0);
 
-// 		// Draw other windows
-// 		DrawWindows(winHandles);
-// 		winHandles.clear();
+		// Draw other windows
+		DrawWindows(winHandles);
+		winHandles.clear();
 
 		// Prepare for screen texture, store in pResource
 		ID3D11Texture2D *pEyeScreen = nullptr;
@@ -1824,25 +1731,7 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 		{ XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
 		{ XMFLOAT3(1.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
 	};
-#ifndef DEBUG_MAP
-	// create the vertex buffer
-	D3D11_BUFFER_DESC BufferDes;
-	ZeroMemory(&BufferDes, sizeof(BufferDes));
 
-	BufferDes.Usage = D3D11_USAGE_DYNAMIC;                // write access access by CPU and GPU
-	BufferDes.ByteWidth = sizeof(VERTEX)* 8;              // size is the VERTEX struct * 3
-	BufferDes.BindFlags = D3D11_BIND_VERTEX_BUFFER;       // use as a vertex buffer
-	BufferDes.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;    // allow CPU to write in buffer
-
-	m_Device->CreateBuffer(&BufferDes, NULL, &pVEyeBuffer);     // create the buffer
-
-	// copy the vertices into the buffer
-	D3D11_MAPPED_SUBRESOURCE maps;
-	m_DeviceContext->Map(pVEyeBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &maps);    // map the buffer
-	memcpy(maps.pData, EyeVertices, sizeof(EyeVertices));                 // copy the data
-	m_DeviceContext->Unmap(pVEyeBuffer, NULL);                                      // unmap the buffer
-
-#else
 	D3D11_BUFFER_DESC BufferDes;
 	ZeroMemory(&BufferDes, sizeof(BufferDes));
 
@@ -1855,7 +1744,6 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	InitData.pSysMem = EyeVertices;
 
 	hr = m_Device->CreateBuffer(&BufferDes, &InitData, &pVEyeBuffer);
-#endif
 
 	DWORD EyeIndices[] =
 	{
@@ -1864,25 +1752,6 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 		4, 5, 6,
 		7, 6, 5,
 	};
-
-#ifndef DEBUG_MAP
-	// create the index buffer
-	BufferDes.Usage = D3D11_USAGE_DYNAMIC;
-	BufferDes.ByteWidth = sizeof(DWORD)* 12;
-	BufferDes.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	BufferDes.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	BufferDes.MiscFlags = 0;
-
-	hr = m_Device->CreateBuffer(&BufferDes, NULL, &pIEyeBuffer);
-	if (FAILED(hr))
-	{
-		return ProcessFailure(m_Device, L"Failed to create shader resource when drawing a frame(in screen)", L"Error", hr, SystemTransitionsExpectedErrors);
-	}
-
-	m_DeviceContext->Map(pIEyeBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &maps);    // map the buffer
-	memcpy(maps.pData, EyeIndices, sizeof(EyeIndices));                   // copy the data
-	m_DeviceContext->Unmap(pIEyeBuffer, NULL);
-#else
 
 	BufferDes.Usage = D3D11_USAGE_DEFAULT;
 	BufferDes.ByteWidth = sizeof(DWORD)* 12;
@@ -1895,7 +1764,6 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 
 	hr = m_Device->CreateBuffer(&BufferDes, &InitData, &pIEyeBuffer);
 
-#endif
 	m_DeviceContext->ClearState();
 
 	m_DeviceContext->OMSetRenderTargets(1, &m_RTV, NULL);
@@ -1905,16 +1773,11 @@ DUPL_RETURN OUTPUTMANAGER::DrawToScreen()
 	float inputs[1] = { 0 };
 	float result[4];
 
-#ifndef DEBUG_LIB
 	if (SZVR_GetData(inputs, result))
 	{
 		SetViewPort(result[2], result[3]);
 		//SetViewPort(800, 600);
 	}
-
-#else
-	SetViewPort(800, 600);
-#endif // !DEBUG_LIB
 
 	m_DeviceContext->IASetInputLayout(m_InputLayout);
 
@@ -2054,6 +1917,13 @@ DUPL_RETURN OUTPUTMANAGER::InitShaders()
 #ifdef VR_DESKTOP
 	Size = ARRAYSIZE(g_PS1);
 	hr = m_Device->CreatePixelShader(g_PS1, Size, nullptr, &m_ScreenPixelShader);
+	if (FAILED(hr))
+	{
+		return ProcessFailure(m_Device, L"Failed to create pixel shader in OUTPUTMANAGER", L"Error", hr, SystemTransitionsExpectedErrors);
+	}
+
+	Size = ARRAYSIZE(g_PS2);
+	hr = m_Device->CreatePixelShader(g_PS2, Size, nullptr, &m_WindowPixelShader);
 	if (FAILED(hr))
 	{
 		return ProcessFailure(m_Device, L"Failed to create pixel shader in OUTPUTMANAGER", L"Error", hr, SystemTransitionsExpectedErrors);
@@ -2242,6 +2112,12 @@ void OUTPUTMANAGER::CleanRefs()
 	{
 		m_ScreenPixelShader->Release();
 		m_ScreenPixelShader = nullptr;
+	}
+
+	if (m_WindowPixelShader)
+	{
+		m_WindowPixelShader->Release();
+		m_WindowPixelShader = nullptr;
 	}
 
 	if (m_ScreenInputLayout)
